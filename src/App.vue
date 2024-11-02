@@ -3,14 +3,17 @@ import {provide, ref} from"vue"
 import addItem from "./components/addItem.vue";
 import todoList from "./components/todoList.vue";
 import editItem from "./components/editItem.vue";
+import useStorage  from "./utility/useStorage";
 
-const valueFromChild = ref(JSON.parse(localStorage.getItem('todoLists')) || []);
+const { getStorage, setStorage } = useStorage();
+const valueFromChild = ref(getStorage('todoLists')|| []);
 const editList=ref([])
 const showModaldialogue = ref(false);
 
 function handleUpdateValue(newValue) {
   valueFromChild.value.push(newValue);
-  localStorage.setItem('todoLists', JSON.stringify(valueFromChild.value))
+  setStorage('todoLists', valueFromChild.value)
+  
 }
 
 function clearList() {
@@ -23,17 +26,14 @@ function deleteItem(id) {
   if (index !== -1) {
     valueFromChild.value.splice(index, 1);
   }
-  localStorage.setItem('todoLists', JSON.stringify(valueFromChild.value))
+  setStorage('todoLists', valueFromChild.value)
 }
 
 function showModalblock(id) {
-  console.log('showModalblock'+id)
   showModaldialogue.value = true;
-
   editList.value = valueFromChild.value?.filter(obj => {
     return obj.id === id
   });
-  console.log(editList.value)
 }
 
 function todoUpdate(data) {
@@ -44,12 +44,11 @@ function todoUpdate(data) {
     updatedItem.priority = data.priority;
     updatedItem.id = data.id;
     valueFromChild.value.splice(itemIndex, 1, updatedItem);
-    localStorage.setItem('todoLists', JSON.stringify(valueFromChild.value))
+    setStorage('todoLists', valueFromChild.value)
   }
 }
 
 function closeModalblock() {
-  console.log('closeModalblock')
   showModaldialogue.value = false
 }
 </script>
